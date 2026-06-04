@@ -1,0 +1,27 @@
+{
+  "ta_url": "http://timestamp.digicert.com",
+  "claim_generator": "Starling Lab / EE292J",
+  "assertions": [
+    {
+      "label": "c2pa.actions",
+      "data": {
+        "actions": [
+          {
+            "action": "c2pa.published"
+          }
+        ]
+      }
+    },
+    {
+      "label": "stds.schema-org.CreativeWork",
+      "data": {
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        "author": ["{{author}}"],
+        "name": "{{file_name}}",
+        "description": "{{description}}"
+      }
+    }
+  ],
+  "credentials": ["{{time_created}}", "{{registrations}}"]
+}
