@@ -1,0 +1,188 @@
+{
+  "ta_url": "http://timestamp.digicert.com",
+  "claim_generator": "Starling Lab / EE292J",
+  "title": "{{file_name}}",
+  "assertions": [
+
+    {
+      "label": "c2pa.actions",
+      "data": {
+        "actions": [
+
+          {
+            "_comment_step": "STEP 0 — DALL-E synthesis of seed image from style + structure references",
+            "action": "c2pa.created",
+            "softwareAgent": "DALL-E (OpenAI)",
+            "description": "Synthetic seed image created by combining a style reference and a structural reference image using DALL-E image generation.",
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+            "parameters": {
+              "prompt": "{{dalle_prompt}}",
+              "style_source_cid": "{{dalle_style_cid}}",
+              "structure_source_cid": "{{dalle_structure_cid}}"
+            },
+            "ingredients": [
+              {
+                "dc:title": "{{dalle_style_title}}",
+                "relationship": "componentOf",
+                "data": {
+                  "cid": "{{dalle_style_cid}}"
+                }
+              },
+              {
+                "dc:title": "{{dalle_structure_title}}",
+                "relationship": "componentOf",
+                "data": {
+                  "cid": "{{dalle_structure_cid}}"
+                }
+              }
+            ]
+          },
+
+          {
+            "_comment_step": "STEP 1 — DALL-E synthesis placed as seed input to Marble",
+            "action": "c2pa.placed",
+            "description": "DALL-E synthetic seed image placed as input to Marble panorama generation.",
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/digitalCapture",
+            "ingredients": [
+              {
+                "dc:title": "{{seed_image_title}}",
+                "relationship": "inputTo",
+                "data": {
+                  "cid": "{{seed_image_cid}}"
+                }
+              }
+            ]
+          },
+
+          {
+            "_comment_step": "STEP 2 — panorama generated from seed (single pass, no edits)",
+            "action": "c2pa.created",
+            "softwareAgent": "WorldLabs Marble",
+            "description": "Equirectangular panorama generated from seed image by Marble.",
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+            "parameters": {
+              "model": "{{marble_model_version}}",
+              "seed_cid": "{{seed_image_cid}}"
+            },
+            "ingredients": [
+              {
+                "dc:title": "{{panorama_ref_title}}",
+                "relationship": "inputTo",
+                "description": "Reference source consulted when composing the panorama generation prompt (e.g. Manzanar camp map).",
+                "data": {
+                  "cid": "{{panorama_ref_cid}}"
+                }
+              }
+            ]
+          },
+
+          {
+            "_comment_step": "STEP 3 — 3-D world generated from panorama (single pass, no edits)",
+            "action": "c2pa.created",
+            "softwareAgent": "WorldLabs Marble",
+            "description": "3-D world model generated from panorama by Marble.",
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+            "parameters": {
+              "model": "{{marble_model_version}}"
+            },
+            "ingredients": [
+              {
+                "dc:title": "{{world_ref_title}}",
+                "relationship": "inputTo",
+                "description": "Archival source consulted when composing the world generation prompt (e.g. survivor quote / testimonial).",
+                "data": {
+                  "cid": "{{world_ref_cid}}"
+                }
+              }
+            ]
+          },
+
+          {
+            "_comment_step": "STEP 4 — final world published",
+            "action": "c2pa.published",
+            "description": "Final 3-D world model exported and published with full provenance manifest."
+          }
+
+        ]
+      }
+    },
+
+    {
+      "label": "stds.schema-org.CreativeWork",
+      "data": {
+        "@context": "https://schema.org",
+        "@type": "3DModel",
+        "name": "{{file_name}}",
+        "description": "{{description}}",
+        "author": ["{{author}}"],
+        "keywords": ["Manzanar", "Japanese American incarceration", "3D world", "Marble", "WorldLabs"],
+        "isBasedOn": [
+          {
+            "@type": "ImageObject",
+            "identifier": "{{dalle_style_cid}}",
+            "name": "{{dalle_style_title}}"
+          },
+          {
+            "@type": "ImageObject",
+            "identifier": "{{dalle_structure_cid}}",
+            "name": "{{dalle_structure_title}}"
+          },
+          {
+            "@type": "CreativeWork",
+            "identifier": "{{panorama_ref_cid}}",
+            "name": "{{panorama_ref_title}}"
+          },
+          {
+            "@type": "CreativeWork",
+            "identifier": "{{world_ref_cid}}",
+            "name": "{{world_ref_title}}"
+          }
+        ],
+        "mainEntityOfPage": "{{project_url}}"
+      }
+    },
+
+    {
+      "label": "c2pa.ai_training_inference",
+      "data": {
+        "model": "WorldLabs Marble",
+        "modelVersion": "{{marble_model_version}}",
+        "inferenceType": "image-to-3d",
+        "inputs": [
+          { "type": "image", "cid": "{{seed_image_cid}}" }
+        ]
+      }
+    }
+
+  ],
+
+  "credentials": ["{{time_created}}", "{{registrations}}"],
+
+  "_template_variables": {
+    "_note": "All {{variables}} below must be resolved against AA attributes before injection.",
+
+    "file_name":              "AA attr: file_name on the final world model CID",
+    "description":            "AA attr: description — human-readable summary of the scene",
+    "author":                 "AA attr: author — creator / class team name",
+    "project_url":            "AA attr: project_url — link to published webapp (optional)",
+    "marble_model_version":   "AA attr: marble_model_version (e.g. '2025-Q2')",
+
+    "dalle_prompt":           "AA attr: dalle_prompt on the synthetic seed CID",
+    "dalle_style_cid":        "CID of the style-reference image fed to DALL-E",
+    "dalle_style_title":      "AA attr: file_name on dalle_style_cid",
+    "dalle_structure_cid":    "CID of the structure-reference image fed to DALL-E",
+    "dalle_structure_title":  "AA attr: file_name on dalle_structure_cid",
+
+    "seed_image_cid":         "CID of the DALL-E synthetic seed image",
+    "seed_image_title":       "AA attr: file_name on seed_image_cid",
+
+    "panorama_ref_cid":       "CID of the reference document consulted for panorama generation (e.g. Manzanar map)",
+    "panorama_ref_title":     "AA attr: file_name on panorama_ref_cid",
+
+    "world_ref_cid":          "CID of the archival source consulted for world generation (e.g. testimonial PDF/image)",
+    "world_ref_title":        "AA attr: file_name on world_ref_cid",
+
+    "time_created":           "AA attr: time_created VC (injected as Verifiable Credential)",
+    "registrations":          "AA attr: registrations VC (injected as Verifiable Credential)"
+  }
+}
