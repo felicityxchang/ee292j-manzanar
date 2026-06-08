@@ -733,15 +733,16 @@ ProvenanceCarousel.prototype._injectStyles = function () {
 
         // Image panel
         '#mzpc-card-image {',
-        '  width:100%; aspect-ratio:16/9;',
+        '  width:100%; height:200px; flex-shrink:0;',
         '  position:relative; overflow:hidden;',
-        '  background:#1c1712; display:flex; align-items:center; justify-content:center;',
+        '  border-radius:24px 24px 0 0;',
+        '  background:#1c1712;',
         '}',
-        '#mzpc-card-image img { width:100%; height:100%; object-fit:cover; display:block; }',
+        '#mzpc-card-image img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }',
 
         // Placeholders
         '.mzpc-ph {',
-        '  width:100%; height:100%;',
+        '  position:absolute; inset:0;',
         '  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;',
         '}',
         '.mzpc-ph-source { background: linear-gradient(140deg,#c4b99a 0%,#a89278 35%,#8a7258 100%); }',
@@ -765,7 +766,7 @@ ProvenanceCarousel.prototype._injectStyles = function () {
         '.mzpc-rel-edited    { background:rgba(140,74,44,.3);  color:#e8b898; }',
 
         // Card body
-        '#mzpc-card-body { padding: 20px 24px 0; font-family:"DM Sans",sans-serif; }',
+        '#mzpc-card-body { padding: 16px 24px 0; font-family:"DM Sans",sans-serif; overflow-y:auto; flex:1; min-height:0; }',
         '.mzpc-card-type { font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--mzpc-ink-faint); margin-bottom:6px; }',
         '.mzpc-card-title { font-family:"Cormorant Garamond",serif; font-weight:300; font-size:24px; color:var(--mzpc-ink); line-height:1.15; margin-bottom:8px; }',
         '.mzpc-card-filename { font-family:monospace; font-size:11px; color:var(--mzpc-ink-faint); margin-bottom:10px; letter-spacing:.02em; }',
@@ -822,7 +823,7 @@ ProvenanceCarousel.prototype._injectStyles = function () {
         '.mzpc-pill-published{ background:var(--mzpc-sand-mid); color:var(--mzpc-ink-soft); }',
 
         // Card footer
-        '#mzpc-card-footer { padding:14px 24px 18px; display:flex; align-items:center; justify-content:space-between; font-family:"DM Sans",sans-serif; }',
+        '#mzpc-card-footer { padding:10px 24px 14px; display:flex; align-items:center; justify-content:space-between; font-family:"DM Sans",sans-serif; flex-shrink:0; }',
         '#mzpc-counter { font-size:11px; color:var(--mzpc-ink-faint); letter-spacing:.08em; }',
         '.mzpc-nav-btns { display:flex; align-items:center; gap:8px; }',
         '#mzpc-prev, #mzpc-next {',
