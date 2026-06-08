@@ -1,0 +1,37 @@
+{
+  "ta_url": "http://timestamp.digicert.com",
+  "claim_generator": "Starling Lab / EE292J",
+  "assertions": [
+    {
+      "label": "c2pa.actions",
+      "data": {
+        "actions": [
+          {
+            "action": "c2pa.published",
+            "description": "Archival asset published with provenance metadata from the Densho Digital Repository and Manzanar collection."
+          }
+        ]
+      }
+    },
+    {
+      "label": "stds.schema-org.CreativeWork",
+      "data": {
+        "@context": "https://schema.org",
+        "@type": "Photograph",
+        "name": "{{title}}",
+        "description": "{{description}}",
+        "author": ["{{author}}"],
+        "dateCreated": "{{date_taken}}",
+        "license": "{{rights}}",
+        "identifier": "{{file_name}}",
+        "isPartOf": {
+          "@type": "Collection",
+          "name": "Manzanar / Densho Digital Repository",
+          "url": "https://densho.org"
+        },
+        "keywords": ["Manzanar", "Japanese American incarceration", "World War II", "Densho"]
+      }
+    }
+  ],
+  "credentials": ["{{time_created}}"]
+}

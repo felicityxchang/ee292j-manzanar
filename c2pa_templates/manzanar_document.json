@@ -1,0 +1,50 @@
+{
+  "ta_url": "http://timestamp.digicert.com",
+  "claim_generator": "Starling Lab / EE292J",
+  "assertions": [
+    {
+      "label": "c2pa.actions",
+      "data": {
+        "actions": [
+          {
+            "action": "c2pa.published",
+            "description": "Archival reference document published with provenance metadata. Sources include NPS, NARA, Densho Digital Repository, and scholarly literature."
+          }
+        ]
+      }
+    },
+    {
+      "label": "stds.schema-org.CreativeWork",
+      "data": {
+        "@context": "https://schema.org",
+        "@type": "DigitalDocument",
+        "name": "{{title}}",
+        "description": "{{description}}",
+        "author": [
+          {
+            "@type": "Organization",
+            "name": "{{author}}"
+          }
+        ],
+        "dateCreated": "{{date_taken}}",
+        "license": "{{rights}}",
+        "identifier": "{{file_name}}",
+        "isPartOf": {
+          "@type": "Collection",
+          "name": "Manzanar War Relocation Center — Reference Documents",
+          "description": "Compiled reference materials on the Manzanar Riot, guard tower architecture, and WRA/Densho authentication records.",
+          "url": "https://ddr.densho.org"
+        },
+        "keywords": [
+          "Manzanar",
+          "Japanese American incarceration",
+          "World War II",
+          "War Relocation Authority",
+          "Densho",
+          "NARA"
+        ]
+      }
+    }
+  ],
+  "credentials": ["{{time_created}}"]
+}

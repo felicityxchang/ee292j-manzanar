@@ -1,0 +1,50 @@
+{
+  "ta_url": "http://timestamp.digicert.com",
+  "claim_generator": "Starling Lab / EE292J",
+  "assertions": [
+    {
+      "label": "c2pa.actions",
+      "data": {
+        "actions": [
+          {
+            "action": "c2pa.published",
+            "description": "Archival map published with provenance metadata. Source: National Park Service, Manzanar National Historic Site."
+          }
+        ]
+      }
+    },
+    {
+      "label": "stds.schema-org.CreativeWork",
+      "data": {
+        "@context": "https://schema.org",
+        "@type": "Map",
+        "name": "{{title}}",
+        "description": "{{description}}",
+        "author": [
+          {
+            "@type": "Organization",
+            "name": "{{author}}",
+            "url": "https://www.nps.gov/manz/"
+          }
+        ],
+        "dateCreated": "{{date_taken}}",
+        "license": "{{rights}}",
+        "identifier": "{{file_name}}",
+        "about": {
+          "@type": "Place",
+          "name": "Manzanar War Relocation Center",
+          "address": "Independence, Inyo County, California",
+          "url": "https://www.nps.gov/manz/planyourvisit/maps.htm"
+        },
+        "keywords": [
+          "Manzanar",
+          "camp layout",
+          "National Park Service",
+          "Japanese American incarceration",
+          "World War II"
+        ]
+      }
+    }
+  ],
+  "credentials": ["{{time_created}}"]
+}

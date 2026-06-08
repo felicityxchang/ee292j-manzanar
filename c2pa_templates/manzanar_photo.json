@@ -1,0 +1,52 @@
+{
+  "ta_url": "http://timestamp.digicert.com",
+  "claim_generator": "Starling Lab / EE292J",
+  "assertions": [
+    {
+      "label": "c2pa.actions",
+      "data": {
+        "actions": [
+          {
+            "action": "c2pa.published",
+            "description": "Archival photograph published with provenance metadata. Original held at Library of Congress or NARA."
+          }
+        ]
+      }
+    },
+    {
+      "label": "stds.schema-org.CreativeWork",
+      "data": {
+        "@context": "https://schema.org",
+        "@type": "Photograph",
+        "name": "{{title}}",
+        "description": "{{description}}",
+        "author": [
+          {
+            "@type": "Person",
+            "name": "{{author}}"
+          }
+        ],
+        "dateCreated": "{{date_taken}}",
+        "license": "{{rights}}",
+        "identifier": "{{file_name}}",
+        "isPartOf": {
+          "@type": "Collection",
+          "name": "Manzanar War Relocation Center",
+          "url": "https://www.loc.gov/collections/ansel-adams-manzanar/"
+        },
+        "locationCreated": {
+          "@type": "Place",
+          "name": "Manzanar War Relocation Center",
+          "address": "Independence, California"
+        },
+        "keywords": [
+          "Manzanar",
+          "Japanese American incarceration",
+          "World War II",
+          "War Relocation Authority"
+        ]
+      }
+    }
+  ],
+  "credentials": ["{{time_created}}"]
+}
