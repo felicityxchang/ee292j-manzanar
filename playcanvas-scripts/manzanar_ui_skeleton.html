@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Snow Day in Manzanar — UI Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand:       #f2ede3;
+  --sand-mid:   #e4ddd0;
+  --sand-deep:  #c9bfaf;
+  --ink:        #1e1a16;
+  --ink-mid:    #3d342b;
+  --ink-soft:   #6b5f53;
+  --ink-faint:  #9e9086;
+  --rust:       #8c4a2c;
+  --rust-lt:    #f2e4db;
+  --gold:       #b08c3c;
+  --gold-lt:    #f5edda;
+  --sage:       #4f6b58;
+  --sage-lt:    #deeade;
+  --slate:      #3b4f5c;
+  --slate-lt:   #dde6ec;
+  --white:      #fdfaf6;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px;
+}
+
+body {
+  background: #141210;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Dev bar ── */
+.dev-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+  background: rgba(8,6,4,0.9); backdrop-filter: blur(12px);
+  padding: 10px 20px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.dev-label { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.25); margin-right: 4px; }
+.dev-btn {
+  padding: 5px 14px; background: transparent; border: 1px solid rgba(255,255,255,.14);
+  color: rgba(255,255,255,.5); font-family: 'DM Sans', sans-serif; font-size: 11px;
+  letter-spacing: .06em; border-radius: 100px; cursor: pointer; transition: all .2s;
+}
+.dev-btn:hover { border-color: rgba(255,255,255,.3); color: rgba(255,255,255,.85); }
+.dev-btn.active { background: rgba(176,140,60,.18); border-color: rgba(176,140,60,.55); color: #d4a84a; }
+
+/* ── Fake world ── */
+.world-bg {
+  position: fixed; inset: 0;
+  background: linear-gradient(160deg, #2a3540 0%, #1a2530 45%, #0e1820 100%);
+}
+.world-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 40% at 50% 100%, rgba(14,24,32,.9) 0%, transparent 70%);
+}
+.world-hint {
+  position: fixed; top: 54px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
+  color: rgba(255,255,255,.07); pointer-events: none; white-space: nowrap;
+}
+
+/* ══════════════════════════════════
+   OVERLAY SYSTEM
+══════════════════════════════════ */
+#ui {
+  position: fixed; inset: 0; z-index: 100; pointer-events: none;
+  font-family: 'DM Sans', sans-serif; font-weight: 300;
+}
+
+/* Veil */
+.veil {
+  position: fixed; inset: 0; background: #0c0a08;
+  pointer-events: all; opacity: 0; transition: opacity 1s ease; z-index: 900;
+}
+.veil.in { opacity: 1; }
+
+/* ── Title ── */
+.title-screen {
+  position: fixed; inset: 0; z-index: 800;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: all; background: var(--white);
+}
+.title-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 55% at 30% 60%, rgba(140,74,44,.06) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 45% at 75% 35%, rgba(176,140,60,.07) 0%, transparent 60%),
+    linear-gradient(155deg, #f5f0e8 0%, #fdfaf6 50%, #ede7da 100%);
+}
+.title-inner {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center;
+  max-width: 500px; padding: 2rem;
+}
+.title-tag {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 10px; font-weight: 400; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: 2.8rem;
+}
+.tag-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--rust); opacity: .6; }
+.title-h1 {
+  font-family: 'Cormorant Garamond', serif; font-weight: 300;
+  font-size: clamp(3.2rem, 8vw, 5.2rem); line-height: 1.06;
+  color: var(--ink); letter-spacing: -.01em; text-align: center;
+}
+.title-h1 em { font-style: italic; color: var(--ink-mid); }
+.divider { display: flex; align-items: center; gap: 16px; width: 100%; margin: 2.2rem 0; }
+.div-line { flex: 1; height: 1px; background: var(--sand-deep); opacity: .6; }
+.div-mark { width: 5px; height: 5px; border: 1px solid var(--rust); transform: rotate(45deg); opacity: .5; }
+.title-credits { font-size: 12px; line-height: 2; color: var(--ink-faint); text-align: center; margin-bottom: 2.8rem; }
+.play-btn {
+  display: inline-flex; align-items: center; gap: 14px; padding: 15px 48px;
+  background: var(--ink); color: var(--sand); border: none; border-radius: 100px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
+  letter-spacing: .12em; text-transform: uppercase; cursor: pointer;
+  transition: background .25s, transform .15s;
+}
+.play-btn:hover { background: var(--ink-mid); transform: translateY(-1px); }
+.play-icon { width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 9px solid currentColor; flex-shrink: 0; }
+.title-note { margin-top: 1.6rem; font-size: 11px; color: var(--ink-faint); opacity: .7; letter-spacing: .04em; }
+
+/* ── Scene card ── */
+.scene-card {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  pointer-events: none; z-index: 700;
+  opacity: 0; transition: opacity .7s ease;
+}
+.scene-card.on { opacity: 1; }
+.scene-eye { font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: rgba(210,200,185,.45); margin-bottom: 1rem; }
+.scene-title {
+  font-family: 'Cormorant Garamond', serif; font-weight: 300;
+  font-size: clamp(2.4rem, 6vw, 4rem); color: rgba(245,240,230,.95);
+  letter-spacing: .04em; text-align: center;
+}
+.scene-rule { width: 40px; height: 1px; background: rgba(176,140,60,.5); margin: 1.4rem auto 0; }
+.scene-sub { margin-top: .9rem; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: rgba(210,200,185,.4); }
+
+/* ── HUD ── */
+.hud { position: fixed; inset: 0; pointer-events: none; z-index: 500; }
+.hud-pill {
+  position: absolute; top: 24px; left: 24px;
+  display: flex; align-items: center;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 100px; backdrop-filter: blur(10px); pointer-events: all; overflow: hidden;
+}
+.hbtn {
+  padding: 10px 18px; background: transparent; border: none;
+  color: rgba(245,240,230,.65); font-family: 'DM Sans', sans-serif; font-size: 13px;
+  cursor: pointer; transition: color .2s, background .2s; display: flex; align-items: center; gap: 6px;
+}
+.hbtn:hover { color: rgba(245,240,230,1); background: rgba(255,255,255,.07); }
+.hbtn + .hbtn { border-left: 1px solid rgba(255,255,255,.1); }
+.hud-exit {
+  position: absolute; bottom: 28px; right: 28px; padding: 11px 28px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.13); border-radius: 100px;
+  color: rgba(245,240,230,.55); font-family: 'DM Sans', sans-serif; font-size: 12px;
+  letter-spacing: .12em; text-transform: uppercase; cursor: pointer; pointer-events: all;
+  backdrop-filter: blur(10px); transition: all .2s;
+}
+.hud-exit:hover { background: rgba(255,255,255,.13); color: rgba(245,240,230,.9); }
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: 320px;
+  background: var(--white); z-index: 600; pointer-events: all;
+  transform: translateX(-100%); transition: transform .4s cubic-bezier(.4,0,.2,1);
+  display: flex; flex-direction: column; border-right: 1px solid var(--sand-mid);
+}
+.sidebar.on { transform: translateX(0); }
+.sb-head {
+  padding: 28px 24px 20px; border-bottom: 1px solid var(--sand-mid);
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.sb-mark { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: 17px; color: var(--ink); line-height: 1.3; }
+.sb-mark span { display: block; font-style: normal; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); margin-top: 3px; }
+.sb-x { background: none; border: none; font-size: 18px; color: var(--ink-faint); cursor: pointer; padding: 4px; border-radius: 50%; transition: background .2s; }
+.sb-x:hover { background: var(--sand); }
+.sb-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+.sb-sec { padding: 20px 24px 12px; }
+.sb-sec + .sb-sec { border-top: 1px solid var(--sand-mid); }
+.sb-lbl { font-size: 9px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 14px; }
+.sb-sec p { font-size: 13px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 10px; }
+.sb-sec p:last-child { margin-bottom: 0; }
+.sb-sec strong { font-weight: 500; color: var(--ink-mid); }
+.nav-chip { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--r-sm); font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; transition: background .15s; }
+.nav-chip:hover { background: var(--sand); }
+.ndot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.ndot.red { background: #b43c1e; box-shadow: 0 0 5px rgba(180,60,30,.5); }
+.ndot.yel { background: #c8a85a; box-shadow: 0 0 5px rgba(200,168,90,.5); }
+.kbd { font-family: monospace; font-size: 11px; background: var(--sand); border: 1px solid var(--sand-deep); border-radius: 4px; padding: 2px 6px; color: var(--ink-mid); }
+.c2pa-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--rust-lt); border-radius: var(--r-sm); padding: 8px 14px; margin-bottom: 12px; font-size: 12px; color: var(--rust); }
+.c2pa-glyph { font-family: 'Cormorant Garamond', serif; font-size: 15px; }
+.wt-replay-btn {
+  width: 100%; margin-top: 8px; padding: 11px; background: var(--gold-lt);
+  border: 1px solid rgba(176,140,60,.3); border-radius: var(--r-sm);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--gold); cursor: pointer; transition: background .2s;
+}
+.wt-replay-btn:hover { background: #eee0c0; }
+.sb-foot { padding: 16px 24px; border-top: 1px solid var(--sand-mid); display: flex; gap: 10px; }
+.sb-fbtn { flex: 1; padding: 10px 8px; background: transparent; border: 1px solid var(--sand-deep); border-radius: var(--r-sm); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); cursor: pointer; transition: background .2s; }
+.sb-fbtn:hover { background: var(--sand); }
+
+/* ══════════════════════════════════
+   WALKTHROUGH — LIGHTBOX SLIDESHOW
+══════════════════════════════════ */
+.wt-scrim {
+  position: fixed; inset: 0;
+  background: rgba(12,10,8,0);
+  z-index: 750;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+  transition: background .45s ease;
+}
+.wt-scrim.on { background: rgba(12,10,8,.82); pointer-events: all; }
+
+.wt-lightbox {
+  width: 90vw; max-width: 640px;
+  background: var(--white);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  opacity: 0; transform: scale(.94) translateY(14px);
+  transition: opacity .45s ease, transform .45s ease;
+  display: flex; flex-direction: column;
+}
+.wt-scrim.on .wt-lightbox { opacity: 1; transform: scale(1) translateY(0); }
+
+/* Illustration panel — top half */
+.wt-visual {
+  width: 100%; aspect-ratio: 16/9;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  flex-shrink: 0;
+}
+.wt-visual-slide {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .4s ease;
+}
+.wt-visual-slide.active { opacity: 1; }
+
+/* Slide color themes */
+.wt-visual-slide.theme-slate  { background: linear-gradient(135deg, #dde6ec 0%, #c8d8e2 100%); }
+.wt-visual-slide.theme-rust   { background: linear-gradient(135deg, #f2e4db 0%, #e8d0c2 100%); }
+.wt-visual-slide.theme-gold   { background: linear-gradient(135deg, #f5edda 0%, #ecdfc4 100%); }
+.wt-visual-slide.theme-sage   { background: linear-gradient(135deg, #deeade 0%, #ccdece 100%); }
+
+.wt-slide-illustration {
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+  padding: 2rem;
+}
+
+/* Key cluster */
+.key-group { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.key-row { display: flex; gap: 6px; }
+.key {
+  width: 40px; height: 40px; border-radius: 8px;
+  background: var(--white); border: 1.5px solid var(--sand-deep);
+  box-shadow: 0 4px 0 var(--sand-deep);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; color: var(--ink-mid); font-family: monospace;
+}
+.key.wide { width: 80px; font-size: 11px; letter-spacing: .05em; }
+.key-label { font-size: 12px; color: var(--slate); letter-spacing: .05em; margin-top: 4px; }
+
+/* Mouse illustration */
+.mouse-fig { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.mouse-body-fig {
+  width: 52px; height: 76px;
+  border: 2px solid var(--sand-deep); border-radius: 26px 26px 18px 18px;
+  background: var(--white); position: relative; overflow: hidden;
+}
+.mouse-btn-line {
+  position: absolute; top: 28px; left: 50%; width: 1.5px; height: 24px;
+  background: var(--sand-deep); transform: translateX(-50%);
+}
+.mouse-btn-left {
+  position: absolute; top: 0; left: 0; right: 50%; height: 28px;
+  background: rgba(59,79,92,.15); border-radius: 26px 0 0 0;
+  border-bottom: 1.5px solid var(--sand-deep);
+}
+.mouse-scroll { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 6px; height: 10px; border: 1.5px solid var(--sand-deep); border-radius: 3px; }
+.mouse-arrows-fig { display: flex; gap: 16px; align-items: center; }
+.arrow-fig { font-size: 22px; color: var(--slate); opacity: .7; }
+
+/* Dot glows */
+.dot-demo { width: 28px; height: 28px; border-radius: 50%; }
+.dot-demo.red    { background: #b43c1e; box-shadow: 0 0 16px 4px rgba(180,60,30,.4); }
+.dot-demo.yellow { background: #c8a85a; box-shadow: 0 0 16px 4px rgba(200,168,90,.4); }
+.demo-label { font-size: 13px; color: var(--ink-soft); }
+
+/* C2PA illustration */
+.c2pa-fig {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 2px solid var(--rust); display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--rust);
+  background: var(--white);
+}
+
+/* ── Bottom content panel ── */
+.wt-content { padding: 28px 32px 24px; }
+
+.wt-step-track {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 20px;
+}
+.wt-pip {
+  height: 4px; flex: 1; border-radius: 100px;
+  background: var(--sand-deep); transition: background .35s;
+}
+.wt-pip.done   { background: var(--gold); }
+.wt-pip.active { background: var(--rust); }
+
+.wt-slide-title {
+  font-family: 'Cormorant Garamond', serif; font-weight: 300;
+  font-size: 26px; color: var(--ink); line-height: 1.15; margin-bottom: 10px;
+}
+.wt-slide-body {
+  font-size: 14px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 24px;
+}
+.wt-slide-body strong { font-weight: 500; color: var(--ink-mid); }
+
+.wt-nav {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.wt-skip-btn {
+  background: none; border: none; font-size: 12px; color: var(--ink-faint);
+  cursor: pointer; letter-spacing: .08em; text-transform: uppercase;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.wt-skip-btn:hover { color: var(--ink-soft); }
+.wt-nav-btns { display: flex; align-items: center; gap: 10px; }
+.wt-prev-btn {
+  padding: 9px 20px; border-radius: 100px; background: transparent;
+  border: 1px solid var(--sand-deep); font-family: 'DM Sans', sans-serif;
+  font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-soft); cursor: pointer; transition: background .2s;
+}
+.wt-prev-btn:hover { background: var(--sand); }
+.wt-next-btn {
+  padding: 9px 24px; border-radius: 100px; background: var(--ink); border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--sand); cursor: pointer; transition: background .2s, transform .15s;
+}
+.wt-next-btn:hover { background: var(--ink-mid); transform: translateY(-1px); }
+.wt-next-btn.finish { background: var(--rust); }
+.wt-next-btn.finish:hover { background: #6d3822; }
+
+/* Skip toast */
+.skip-toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: var(--sand); padding: 12px 24px;
+  border-radius: 100px; font-size: 13px; z-index: 590; pointer-events: none;
+  white-space: nowrap; opacity: 1; transition: opacity .5s;
+}
+
+/* ── Artifact viewer ── */
+.art-scrim {
+  position: fixed; inset: 0; background: rgba(12,10,8,0); z-index: 650;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; transition: background .45s ease;
+}
+.art-scrim.on { background: rgba(12,10,8,.86); pointer-events: all; }
+.art-panel {
+  width: 90vw; max-width: 800px; background: var(--white); border-radius: var(--r-xl);
+  overflow: hidden; opacity: 0; transform: scale(.93) translateY(12px);
+  transition: opacity .4s ease, transform .4s ease; position: relative;
+}
+.art-scrim.on .art-panel { opacity: 1; transform: scale(1) translateY(0); }
+.art-close-row { position: absolute; top: 14px; right: 14px; z-index: 5; }
+.art-close-btn {
+  display: flex; align-items: center; gap: 7px; padding: 7px 14px 7px 10px;
+  border-radius: 100px; background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.15);
+  color: rgba(255,255,255,.8); font-family: 'DM Sans', sans-serif; font-size: 11px;
+  letter-spacing: .08em; text-transform: uppercase; cursor: pointer; backdrop-filter: blur(8px);
+  transition: background .2s;
+}
+.art-close-btn:hover { background: rgba(0,0,0,.65); color: white; }
+.art-img { width: 100%; aspect-ratio: 16/10; background: #1c1712; display: flex; align-items: center; justify-content: center; }
+.art-placeholder { width: 100%; height: 100%; background: linear-gradient(140deg, #c4b99a 0%, #a8967a 40%, #8a7560 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.art-ph-title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; color: rgba(30,26,22,.55); text-align: center; padding: 0 2rem; }
+.art-ph-sub { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: rgba(30,26,22,.35); }
+.art-meta { padding: 20px 24px 22px; }
+.art-meta-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
+.art-type { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 5px; }
+.art-caption { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 300; color: var(--ink); line-height: 1.35; }
+.art-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.badge-auth { display: inline-flex; align-items: center; gap: 6px; background: var(--rust-lt); border-radius: 100px; padding: 5px 12px 5px 8px; font-size: 11px; color: var(--rust); }
+.badge-auth .g { font-family: 'Cormorant Garamond', serif; font-size: 14px; }
+.badge-audio { display: inline-flex; align-items: center; gap: 5px; background: var(--sage-lt); border-radius: 100px; padding: 5px 12px; font-size: 11px; color: var(--sage); }
+.art-src { font-size: 12px; color: var(--ink-faint); line-height: 1.5; border-top: 1px solid var(--sand-mid); padding-top: 12px; margin-top: 12px; }
+.art-src a { color: var(--sage); text-decoration: underline; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="world-bg"></div>
+<div class="world-hint">← PlayCanvas 3D world renders here →</div>
+
+<!-- Dev controls -->
+<div class="dev-bar">
+  <span class="dev-label">Preview</span>
+  <button class="dev-btn active" id="btn-title"      onclick="show('title')">Title screen</button>
+  <button class="dev-btn"        id="btn-wt"         onclick="show('walkthrough')">Walkthrough</button>
+  <button class="dev-btn"        id="btn-scene"      onclick="show('scene')">Scene card</button>
+  <button class="dev-btn"        id="btn-artifact"   onclick="show('artifact')">Artifact viewer</button>
+  <button class="dev-btn"        id="btn-sidebar"    onclick="show('sidebar')">Sidebar</button>
+  <button class="dev-btn"        id="btn-hud"        onclick="show('hud')">HUD</button>
+  <button class="dev-btn"        id="btn-transition" onclick="previewTransition()">Scene transition</button>
+</div>
+
+<!-- UI Root -->
+<div id="ui">
+
+  <!-- Veil -->
+  <div class="veil" id="veil"></div>
+
+  <!-- Title -->
+  <div class="title-screen" id="title-screen">
+    <div class="title-bg"></div>
+    <div class="title-inner">
+      <div class="title-tag">
+        <span class="tag-dot"></span>
+        Manzanar War Relocation Center · 1944
+        <span class="tag-dot"></span>
+      </div>
+      <h1 class="title-h1">A Snow Day<br><em>in Manzanar</em></h1>
+      <div class="divider">
+        <div class="div-line"></div><div class="div-mark"></div><div class="div-line"></div>
+      </div>
+      <div class="title-credits">
+        3D illustrations inspired by Kango Takamura<br>
+        Audio readings by EE 292J students
+      </div>
+      <button class="play-btn" id="play-btn">
+        <span class="play-icon"></span>Enter the world
+      </button>
+      <div class="title-note">Background audio available on YouTube</div>
+    </div>
+  </div>
+
+  <!-- Scene card -->
+  <div class="scene-card" id="scene-card">
+    <div class="scene-eye">Now entering</div>
+    <div class="scene-title" id="scene-title">Outdoors</div>
+    <div class="scene-rule"></div>
+    <div class="scene-sub" id="scene-sub">Manzanar War Relocation Center</div>
+  </div>
+
+  <!-- HUD -->
+  <div class="hud" id="hud" style="display:none;">
+    <div class="hud-pill">
+      <button class="hbtn" id="hud-menu">&#9776; Menu</button>
+      <button class="hbtn" id="hud-sound">&#9834; Sound</button>
+    </div>
+    <button class="hud-exit" id="hud-exit">Exit</button>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <div class="sb-mark">A Snow Day in Manzanar<span>World navigation</span></div>
+      <button class="sb-x" id="sb-close">&#10005;</button>
+    </div>
+    <div class="sb-body">
+      <div class="sb-sec">
+        <div class="sb-lbl">Getting around</div>
+        <div class="nav-chip"><span class="ndot yel"></span><span>Yellow glow — enter a new area</span></div>
+        <div class="nav-chip"><span class="ndot red"></span><span>Red glow — view an artifact</span></div>
+        <div class="nav-chip" style="flex-wrap:wrap; gap:10px;">
+          <div style="display:flex;gap:4px;">
+            <span class="kbd">W</span><span class="kbd">A</span><span class="kbd">S</span><span class="kbd">D</span>
+          </div>
+          <span>Walk &nbsp;·&nbsp; Mouse drag to look</span>
+        </div>
+        <button class="wt-replay-btn" id="sb-wt-btn">Replay walkthrough</button>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-lbl">About the world</div>
+        <p>This 3D environment is inspired by the watercolor paintings of <strong>Kango Takamura</strong>, created during his incarceration at Manzanar in 1944.</p>
+        <p>Scenes are informed by historical photographs, personal letters, and oral testimonies from the Manzanar National Historic Site archives.</p>
+        <p>Built in <strong>Marble</strong>, published in PlayCanvas.</p>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Document authentication</div>
+        <div class="c2pa-pill"><span class="c2pa-glyph">&#169;P</span> C2PA Authenticated</div>
+        <p>The <strong>©P</strong> symbol means an artifact's chain of custody has been verified using the <strong>C2PA standard</strong> — it has not been digitally altered from its archival source.</p>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Credits</div>
+        <p>Watercolors by <strong>Kango Takamura</strong> — courtesy of the Manzanar National Historic Site and the Kango Takamura Collection.</p>
+        <p>Audio readings by EE 292J students.</p>
+      </div>
+    </div>
+    <div class="sb-foot">
+      <button class="sb-fbtn" id="sb-sound">&#9834; Sound</button>
+      <button class="sb-fbtn" id="sb-exit">Exit world</button>
+    </div>
+  </div>
+
+  <!-- ══ WALKTHROUGH LIGHTBOX ══ -->
+  <div class="wt-scrim" id="wt-scrim">
+    <div class="wt-lightbox" id="wt-lightbox">
+
+      <!-- Visual panel — slides swap here -->
+      <div class="wt-visual" id="wt-visual">
+
+        <!-- Slide 0: Walk around -->
+        <div class="wt-visual-slide theme-slate active" id="wt-slide-0">
+          <div class="wt-slide-illustration">
+            <div class="key-group">
+              <div class="key-row"><div class="key">W</div></div>
+              <div class="key-row">
+                <div class="key">A</div><div class="key">S</div><div class="key">D</div>
+              </div>
+            </div>
+            <div class="key-label" style="color:var(--slate);">or arrow keys</div>
+          </div>
+        </div>
+
+        <!-- Slide 1: Look around -->
+        <div class="wt-visual-slide theme-slate" id="wt-slide-1">
+          <div class="wt-slide-illustration">
+            <div class="mouse-fig">
+              <div class="mouse-body-fig">
+                <div class="mouse-btn-left"></div>
+                <div class="mouse-btn-line"></div>
+                <div class="mouse-scroll"></div>
+              </div>
+              <div class="mouse-arrows-fig">
+                <span class="arrow-fig">&#8592;</span>
+                <span style="font-size:11px;color:var(--slate);letter-spacing:.08em;text-transform:uppercase;">drag</span>
+                <span class="arrow-fig">&#8594;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: Click artifacts (red) -->
+        <div class="wt-visual-slide theme-rust" id="wt-slide-2">
+          <div class="wt-slide-illustration">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+              <div class="dot-demo red"></div>
+              <div class="demo-label" style="color:var(--rust);">Glowing red &mdash; historical artifact</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Enter new scenes (yellow) -->
+        <div class="wt-visual-slide theme-gold" id="wt-slide-3">
+          <div class="wt-slide-illustration">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+              <div class="dot-demo yellow"></div>
+              <div class="demo-label" style="color:var(--gold);">Glowing yellow &mdash; new area</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 4: Navigation menu -->
+        <div class="wt-visual-slide theme-sage" id="wt-slide-4">
+          <div class="wt-slide-illustration" style="gap:14px;">
+            <!-- Mini pill mockup -->
+            <div style="display:flex;align-items:center;gap:2px;background:rgba(79,107,88,0.18);border:1.5px solid rgba(79,107,88,0.35);border-radius:100px;padding:2px;overflow:hidden;">
+              <div style="padding:8px 16px;border-radius:100px;background:rgba(79,107,88,0.25);font-size:12px;font-weight:500;color:var(--sage);letter-spacing:.04em;">&#9776; Menu</div>
+              <div style="padding:8px 16px;font-size:12px;color:rgba(79,107,88,0.7);letter-spacing:.04em;border-left:1px solid rgba(79,107,88,0.2);">&#9834; Sound</div>
+            </div>
+            <!-- Mini sidebar preview -->
+            <div style="width:180px;background:var(--white);border:1.5px solid var(--sand-mid);border-radius:10px;overflow:hidden;font-size:11px;">
+              <div style="padding:10px 12px 8px;border-bottom:1px solid var(--sand-mid);font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--ink);font-size:13px;">A Snow Day in Manzanar</div>
+              <div style="padding:10px 12px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;gap:7px;color:var(--ink-soft);"><span style="width:7px;height:7px;border-radius:50%;background:#c8a85a;display:inline-block;"></span>Yellow glow — new area</div>
+                <div style="display:flex;align-items:center;gap:7px;color:var(--ink-soft);"><span style="width:7px;height:7px;border-radius:50%;background:#b43c1e;display:inline-block;"></span>Red glow — artifact</div>
+                <div style="color:var(--ink-faint);padding-top:4px;border-top:1px solid var(--sand-mid);">About · C2PA · Credits</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /wt-visual -->
+
+      <!-- Content panel -->
+      <div class="wt-content">
+        <div class="wt-step-track" id="wt-pips"></div>
+        <div class="wt-slide-title" id="wt-title"></div>
+        <div class="wt-slide-body"  id="wt-body"></div>
+        <div class="wt-nav">
+          <button class="wt-skip-btn" id="wt-skip">Skip</button>
+          <div class="wt-nav-btns">
+            <button class="wt-prev-btn" id="wt-prev">Back</button>
+            <button class="wt-next-btn" id="wt-next">Next</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /wt-lightbox -->
+  </div><!-- /wt-scrim -->
+
+  <!-- Artifact viewer -->
+  <div class="art-scrim" id="art-scrim">
+    <div class="art-panel">
+      <div class="art-close-row">
+        <button class="art-close-btn" id="art-close">&#10005;&nbsp; Return to scene</button>
+      </div>
+      <div class="art-img">
+        <div class="art-placeholder">
+          <div class="art-ph-title">Snow in January 1944, Block 35 at Manzanar</div>
+          <div class="art-ph-sub">Watercolor by Kango Takamura</div>
+        </div>
+      </div>
+      <div class="art-meta">
+        <div class="art-meta-row">
+          <div>
+            <div class="art-type">Watercolor Painting</div>
+            <div class="art-caption">Snow in January 1944, Block 35 at Manzanar</div>
+          </div>
+          <div class="art-badges">
+            <div class="badge-auth"><span class="g">&#169;P</span> Authenticated</div>
+            <div class="badge-audio">&#9834; Audio quieted</div>
+          </div>
+        </div>
+        <div class="art-src">
+          Manzanar, California, January 6, 1944.
+          Courtesy of <a href="#">Manzanar National Historic Site and the Kango Takamura Collection</a>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- #ui -->
+
+<script>
+/* ─── Walkthrough data ─────────────────────────────────────── */
+const SLIDES = [
+  {
+    visualIdx: 0,
+    title: 'Walking through the camp',
+    body:  'Use the <strong>W A S D keys</strong> or the <strong>arrow keys</strong> on your keyboard to move forward, backward, and side to side through the scene.',
+  },
+  {
+    visualIdx: 1,
+    title: 'Looking around',
+    body:  '<strong>Click and drag the mouse</strong> left or right to turn your view and look around. You can explore every corner of the space.',
+  },
+  {
+    visualIdx: 2,
+    title: 'Viewing historical artifacts',
+    body:  'Objects with a <strong>red glow</strong> are historical artifacts — watercolors, photographs, letters, and documents. Click one to open it full screen.',
+  },
+  {
+    visualIdx: 3,
+    title: 'Entering a new area',
+    body:  'Doors and passages with a <strong>yellow glow</strong> are entrances to a new part of the camp. Click one to travel there. The screen will fade to black and carry you through.',
+  },
+  {
+    visualIdx: 4,
+    title: 'Your navigation menu',
+    body:  'The <strong>Menu button</strong> in the top-left corner opens a sidebar at any time. Inside you\'ll find navigation controls, information about how the world was built, details on C2PA document authentication, and credits. You can also <strong>replay this walkthrough</strong> from there.',
+  },
+];
+
+const SCENES = {
+  outside:  { title: 'Outdoors',                  sub: 'Manzanar War Relocation Center' },
+  barracks: { title: 'The Barracks',               sub: 'Block Housing' },
+  messhall: { title: 'The Mess Hall',              sub: 'Community Dining' },
+  hospital: { title: 'Hospital Ward',              sub: 'Medical Block' },
+  garden:   { title: 'The Japanese Water Gardens', sub: 'A Place of Refuge' },
+};
+
+/* ─── State ────────────────────────────────────────────────── */
+let step = 0;
+let soundOn = true;
+let sidebarOpen = false;
+
+/* ─── Helpers ──────────────────────────────────────────────── */
+const $ = id => document.getElementById(id);
+
+/* ─── Walkthrough ──────────────────────────────────────────── */
+function openWT() {
+  $('wt-scrim').classList.add('on');
+  goToSlide(0);
+}
+
+function closeWT() {
+  $('wt-scrim').classList.remove('on');
+}
+
+function goToSlide(idx) {
+  if (idx < 0 || idx >= SLIDES.length) return;
+  step = idx;
+  const s = SLIDES[idx];
+
+  // Swap visual
+  document.querySelectorAll('.wt-visual-slide').forEach((el, i) => {
+    el.classList.toggle('active', i === s.visualIdx);
+  });
+
+  // Update pips
+  const pips = $('wt-pips');
+  pips.innerHTML = SLIDES.map((_, i) =>
+    `<div class="wt-pip ${i < idx ? 'done' : i === idx ? 'active' : ''}"></div>`
+  ).join('');
+
+  // Update text (fade trick)
+  const titleEl = $('wt-title');
+  const bodyEl  = $('wt-body');
+  titleEl.style.opacity = '0';
+  bodyEl.style.opacity  = '0';
+  setTimeout(() => {
+    titleEl.textContent = s.title;
+    bodyEl.innerHTML    = s.body;
+    titleEl.style.transition = 'opacity .3s';
+    bodyEl.style.transition  = 'opacity .3s';
+    titleEl.style.opacity = '1';
+    bodyEl.style.opacity  = '1';
+  }, 160);
+
+  // Button states
+  $('wt-prev').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  const nextBtn = $('wt-next');
+  const isLast  = idx === SLIDES.length - 1;
+  nextBtn.textContent = isLast ? 'Done' : 'Next';
+  nextBtn.className   = 'wt-next-btn' + (isLast ? ' finish' : '');
+}
+
+$('wt-next').addEventListener('click', () => {
+  if (step < SLIDES.length - 1) goToSlide(step + 1);
+  else closeWT();
+});
+$('wt-prev').addEventListener('click', () => { if (step > 0) goToSlide(step - 1); });
+$('wt-skip').addEventListener('click', () => {
+  closeWT();
+  const t = document.createElement('div');
+  t.className = 'skip-toast';
+  t.innerHTML = 'Walkthrough skipped &nbsp;·&nbsp; Replay from the <strong>Menu</strong>';
+  $('ui').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; }, 3200);
+  setTimeout(() => t.remove(), 3800);
+});
+
+/* ─── Sidebar ──────────────────────────────────────────────── */
+function openSidebar()  { sidebarOpen = true;  $('sidebar').classList.add('on'); }
+function closeSidebar() { sidebarOpen = false; $('sidebar').classList.remove('on'); }
+function toggleSidebar() { sidebarOpen ? closeSidebar() : openSidebar(); }
+
+$('hud-menu').addEventListener('click', toggleSidebar);
+$('sb-close').addEventListener('click', closeSidebar);
+$('sb-wt-btn').addEventListener('click', () => { closeSidebar(); openWT(); });
+
+/* ─── Sound ────────────────────────────────────────────────── */
+function toggleSound() {
+  soundOn = !soundOn;
+  const ic = soundOn ? '&#9834;' : '&#9832;';
+  $('hud-sound').innerHTML = ic + ' Sound';
+  $('sb-sound').innerHTML  = ic + (soundOn ? ' Sound' : ' Muted');
+}
+$('hud-sound').addEventListener('click', toggleSound);
+$('sb-sound').addEventListener('click', toggleSound);
+
+/* ─── Exit ─────────────────────────────────────────────────── */
+function doExit() { if (confirm('Exit the world?')) show('title'); }
+$('hud-exit').addEventListener('click', doExit);
+$('sb-exit').addEventListener('click', doExit);
+
+/* ─── Artifact ─────────────────────────────────────────────── */
+$('art-close').addEventListener('click', () => $('art-scrim').classList.remove('on'));
+
+/* ─── Veil / Fades ─────────────────────────────────────────── */
+function fadeIn(cb)  { const v=$('veil'); v.classList.add('in');    setTimeout(cb, 950); }
+function fadeOut(cb) { const v=$('veil'); v.classList.remove('in'); setTimeout(()=>{ cb&&cb(); }, 950); }
+
+/* ─── Play button — full entry sequence ─────────────────────── */
+$('play-btn').addEventListener('click', () => {
+  fadeIn(() => {
+    $('title-screen').style.display = 'none';
+    $('hud').style.display = '';
+
+    // Show scene card over black
+    $('scene-title').textContent = 'Outdoors';
+    $('scene-sub').textContent   = 'Manzanar War Relocation Center';
+    $('scene-card').classList.add('on');
+
+    // Fade world back in after a beat
+    setTimeout(() => {
+      fadeOut(() => {
+        // Scene card lingers for 3 seconds after world is visible
+        setTimeout(() => {
+          $('scene-card').classList.remove('on');
+          // Then open walkthrough
+          setTimeout(openWT, 600);
+        }, 3000);
+      });
+    }, 800);
+  });
+});
+
+/* ─── Scene transition preview ──────────────────────────────── */
+function previewTransition() {
+  document.querySelectorAll('.dev-btn').forEach(b => b.classList.remove('active'));
+  $('btn-transition').classList.add('active');
+
+  // Reset overlapping panels
+  $('title-screen').style.display = 'none';
+  $('hud').style.display = '';
+  $('wt-scrim').classList.remove('on');
+  $('art-scrim').classList.remove('on');
+  $('scene-card').classList.remove('on');
+  closeSidebar();
+
+  const v = $('veil');
+  // Fade to black
+  v.style.transition = 'opacity 0.9s ease';
+  v.style.pointerEvents = 'all';
+  v.classList.add('in');
+
+  setTimeout(() => {
+    // Show scene card over the dark veil
+    $('scene-title').textContent = SCENES.messhall.title;
+    $('scene-sub').textContent   = SCENES.messhall.sub;
+    $('scene-card').classList.add('on');
+
+    // Fade world back in
+    setTimeout(() => {
+      v.classList.remove('in');
+      setTimeout(() => {
+        v.style.pointerEvents = 'none';
+        // Scene card lingers then fades
+        setTimeout(() => {
+          $('scene-card').classList.remove('on');
+        }, 3000);
+      }, 950);
+    }, 700);
+  }, 950);
+}
+
+/* ─── Dev switcher ─────────────────────────────────────────── */
+function show(state) {
+  document.querySelectorAll('.dev-btn').forEach(b => b.classList.remove('active'));
+  $('btn-' + state).classList.add('active');
+
+  // Reset all
+  $('title-screen').style.display = 'none';
+  $('hud').style.display = 'none';
+  $('wt-scrim').classList.remove('on');
+  $('art-scrim').classList.remove('on');
+  $('scene-card').classList.remove('on');
+  $('veil').classList.remove('in');
+  $('veil').style.pointerEvents = 'none';
+  closeSidebar();
+
+  switch (state) {
+    case 'title':
+      $('title-screen').style.display = '';
+      break;
+    case 'walkthrough':
+      $('hud').style.display = '';
+      openWT();
+      break;
+    case 'scene':
+      $('veil').style.transition = 'none';
+      $('veil').classList.add('in');
+      $('veil').style.pointerEvents = 'none';
+      $('scene-title').textContent = 'The Mess Hall';
+      $('scene-sub').textContent   = 'Community Dining';
+      $('scene-card').classList.add('on');
+      break;
+    case 'artifact':
+      $('hud').style.display = '';
+      $('art-scrim').classList.add('on');
+      break;
+    case 'sidebar':
+      $('hud').style.display = '';
+      openSidebar();
+      break;
+    case 'hud':
+      $('hud').style.display = '';
+      break;
+  }
+}
+</script>
+</body>
+</html>
