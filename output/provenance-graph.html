@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manzanar 3D World — Provenance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand:      #f2ede3;
+  --sand-mid:  #e4ddd0;
+  --sand-deep: #c9bfaf;
+  --ink:       #1e1a16;
+  --ink-mid:   #3d342b;
+  --ink-soft:  #6b5f53;
+  --ink-faint: #9e9086;
+  --rust:      #8c4a2c;
+  --rust-lt:   #f2e4db;
+  --gold:      #b08c3c;
+  --gold-lt:   #f5edda;
+  --sage:      #4f6b58;
+  --sage-lt:   #deeade;
+  --slate:     #3b4f5c;
+  --slate-lt:  #dde6ec;
+  --white:     #fdfaf6;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px;
+}
+
+body {
+  background: #141210;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 16px;
+  gap: 0;
+}
+
+/* ── Header ── */
+.pg-header {
+  text-align: center;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.pg-eyebrow {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+  color: rgba(210,200,185,.35); margin-bottom: 10px;
+}
+.pg-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--rust); opacity: .4; }
+.pg-title {
+  font-family: 'Cormorant Garamond', serif; font-weight: 300;
+  font-size: clamp(1.6rem, 4vw, 2.4rem); color: rgba(245,240,230,.9);
+  letter-spacing: .01em; line-height: 1.15;
+}
+.pg-title em { font-style: italic; color: rgba(176,140,60,.85); }
+
+/* ── Pipeline track ── */
+.pipeline-track {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 14px;
+  max-width: 680px; width: 100%;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+.pt-node {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  cursor: pointer; flex-shrink: 0;
+}
+.pt-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1.5px solid rgba(200,190,170,.2);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .2s, background .2s;
+  background: rgba(20,18,16,.6);
+}
+.pt-dot-inner { width: 8px; height: 8px; border-radius: 50%; background: rgba(200,190,170,.2); transition: background .2s; }
+.pt-node.active .pt-dot { border-color: var(--gold); background: rgba(176,140,60,.12); }
+.pt-node.active .pt-dot-inner { background: var(--gold); }
+.pt-node.done .pt-dot { border-color: rgba(79,107,88,.5); }
+.pt-node.done .pt-dot-inner { background: var(--sage); }
+.pt-node:hover .pt-dot { border-color: rgba(200,190,170,.5); }
+.pt-label {
+  font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(200,190,170,.3); text-align: center; line-height: 1.3;
+  max-width: 60px; transition: color .2s;
+}
+.pt-node.active .pt-label { color: rgba(176,140,60,.7); }
+.pt-node.done .pt-label { color: rgba(79,107,88,.6); }
+.pt-edge {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 3px; padding: 0 2px; padding-bottom: 20px;
+}
+.pt-edge-line {
+  width: 100%; height: 1px;
+  background: rgba(200,190,170,.12);
+}
+.pt-edge-label {
+  font-size: 8px; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(200,190,170,.2); white-space: nowrap;
+}
+
+/* ── Carousel wrapper ── */
+.carousel-wrap {
+  width: 100%; max-width: 680px;
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.5), 0 4px 16px rgba(0,0,0,.3);
+  display: flex; flex-direction: column;
+  flex: 1; min-height: 0;
+}
+
+/* Image panel */
+.card-image {
+  width: 100%; height: 200px;
+  flex-shrink: 0;
+  position: relative; overflow: hidden;
+  background: #1c1712;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.card-image img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.card-image-placeholder {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px;
+}
+.card-image-placeholder.theme-source { background: linear-gradient(140deg, #c4b99a 0%, #a89278 35%, #8a7258 100%); }
+.card-image-placeholder.theme-pano   { background: linear-gradient(140deg, #8aa8bc 0%, #6a8898 35%, #4a6878 100%); }
+.card-image-placeholder.theme-world  { background: linear-gradient(140deg, #8a9870 0%, #6a7850 35%, #4a5830 100%); }
+.card-image-placeholder.theme-ref    { background: linear-gradient(140deg, #c8aa7a 0%, #a88a5a 35%, #886a3a 100%); }
+.ph-title {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 17px; color: rgba(30,26,22,.55); text-align: center; padding: 0 2rem;
+  line-height: 1.35;
+}
+.ph-sub {
+  font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(30,26,22,.3);
+}
+
+/* Edge badge — overlaid on image bottom */
+.edge-badge {
+  position: absolute; bottom: 12px; left: 16px;
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(12,10,8,.7); border-radius: 100px;
+  padding: 5px 12px 5px 8px;
+  backdrop-filter: blur(8px);
+  border: 0.5px solid rgba(255,255,255,.1);
+}
+.edge-arrow { font-size: 13px; color: rgba(255,255,255,.5); line-height: 1; }
+.edge-from { font-size: 10px; color: rgba(210,200,185,.55); letter-spacing: .08em; }
+.edge-rel {
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 2px; font-weight: 500;
+}
+.edge-rel.generated { background: rgba(79,107,88,.3); color: #a8d8a8; }
+.edge-rel.edited    { background: rgba(140,74,44,.3);  color: #e8b898; }
+.edge-rel.informed  { background: rgba(176,140,60,.25);color: #d4b878; }
+
+/* ── Card content ── */
+.card-body {
+  padding: 16px 24px 0;
+  overflow-y: auto;
+  flex: 1; min-height: 0;
+}
+
+.card-type {
+  font-size: 9px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: 6px;
+}
+.card-title {
+  font-family: 'Cormorant Garamond', serif; font-weight: 300;
+  font-size: 24px; color: var(--ink); line-height: 1.15; margin-bottom: 8px;
+}
+.card-filename {
+  font-family: 'DM Sans', monospace; font-size: 11px;
+  color: var(--ink-faint); margin-bottom: 10px; letter-spacing: .02em;
+}
+.card-cid {
+  font-family: monospace; font-size: 10px; color: var(--ink-faint);
+  background: var(--sand); border-radius: 4px; padding: 4px 8px;
+  word-break: break-all; line-height: 1.6; margin-bottom: 12px;
+  border: 0.5px solid var(--sand-deep);
+}
+.card-desc {
+  font-size: 13px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 14px;
+}
+
+/* Prompt block */
+.card-prompt {
+  background: var(--gold-lt); border-radius: var(--r-sm);
+  padding: 10px 14px; margin-bottom: 14px;
+  border-left: 2px solid rgba(176,140,60,.4);
+}
+.card-prompt-label {
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 5px; font-weight: 500;
+}
+.card-prompt-text {
+  font-size: 12px; color: var(--ink-mid); line-height: 1.65; font-style: italic;
+}
+
+/* Ingredients */
+.card-ingredients { margin-bottom: 14px; }
+.card-ingredients-label {
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: 8px; font-weight: 500;
+}
+.ingredient-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 7px 10px; background: var(--sand); border-radius: var(--r-sm);
+  margin-bottom: 6px; border: 0.5px solid var(--sand-deep);
+}
+.ing-rel {
+  font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 6px; border-radius: 2px; flex-shrink: 0; margin-top: 1px;
+}
+.ing-rel.inputTo  { background: var(--slate-lt); color: var(--slate); }
+.ing-rel.informed { background: var(--gold-lt);  color: #7a6020; }
+.ing-info { flex: 1; min-width: 0; }
+.ing-name { font-size: 11px; color: var(--ink-mid); font-weight: 400; margin-bottom: 2px; }
+.ing-cid  { font-family: monospace; font-size: 9px; color: var(--ink-faint); word-break: break-all; }
+
+/* ── C2PA bar ── */
+.c2pa-bar {
+  margin: 0 24px; border-top: 0.5px solid var(--sand-mid);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; cursor: pointer; user-select: none;
+  transition: opacity .15s;
+}
+.c2pa-bar:hover { opacity: .8; }
+.c2pa-left { display: flex; align-items: center; gap: 8px; }
+.c2pa-badge {
+  background: #2a4a2a; color: #a8d8a8;
+  font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 2px; font-weight: 500;
+}
+.c2pa-status { font-size: 11px; color: var(--ink-soft); }
+.c2pa-chevron { font-size: 18px; color: var(--ink-faint); transition: transform .2s; line-height: 1; }
+
+/* Manifest panel */
+.manifest {
+  margin: 0 24px; background: var(--gold-lt); border-radius: var(--r-sm);
+  overflow: hidden; max-height: 0; transition: max-height .35s ease;
+  border: 0.5px solid rgba(176,140,60,.2);
+}
+.manifest.open { max-height: 600px; }
+.manifest-inner { padding: 14px 16px; }
+.manifest-section { margin-bottom: 12px; }
+.manifest-section:last-child { margin-bottom: 0; }
+.manifest-heading {
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+  color: #9a7d52; margin-bottom: 6px; padding-bottom: 4px;
+  border-bottom: 0.5px solid rgba(176,140,60,.3);
+}
+.manifest-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px; padding: 3px 0;
+}
+.mk { font-size: 11px; color: #9a7d52; flex-shrink: 0; }
+.mv { font-size: 11px; color: #3a2a10; text-align: right; word-break: break-all; }
+.mv-mono { font-family: monospace; font-size: 9px; color: #6b5030; }
+.action-pill {
+  display: inline-block; font-size: 9px; padding: 2px 7px;
+  border-radius: 2px; letter-spacing: .06em; text-transform: uppercase;
+}
+.pill-created  { background: #dce8f0; color: #1a4a6a; }
+.pill-edited   { background: var(--rust-lt); color: var(--rust); }
+.pill-placed   { background: var(--sage-lt); color: var(--sage); }
+.pill-published{ background: var(--sand-mid); color: var(--ink-soft); }
+
+/* ── Card footer / nav ── */
+.card-footer {
+  padding: 10px 24px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.step-counter { font-size: 11px; color: var(--ink-faint); letter-spacing: .08em; }
+.nav-btns { display: flex; align-items: center; gap: 8px; }
+.nav-prev, .nav-next {
+  padding: 9px 22px; border-radius: 100px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px;
+  letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
+  transition: background .2s, transform .15s; border: none;
+}
+.nav-prev {
+  background: transparent; border: 1px solid var(--sand-deep);
+  color: var(--ink-soft);
+}
+.nav-prev:hover { background: var(--sand); }
+.nav-prev:disabled { opacity: .35; cursor: default; }
+.nav-next {
+  background: var(--ink); color: var(--sand);
+}
+.nav-next:hover { background: var(--ink-mid); transform: translateY(-1px); }
+.nav-next:disabled { opacity: .35; cursor: default; transform: none; }
+
+/* Progress pips */
+.pips {
+  display: flex; gap: 5px; align-items: center; margin-bottom: 8px; flex-shrink: 0;
+}
+.pip {
+  height: 3px; flex: 1; border-radius: 100px;
+  background: rgba(200,190,170,.15); transition: background .3s;
+}
+.pip.done   { background: var(--sage); }
+.pip.active { background: var(--rust); }
+
+/* ── Divider in card ── */
+.card-divider { height: 0.5px; background: var(--sand-mid); margin: 0 24px 14px; }
+</style>
+</head>
+<body>
+
+<div class="pg-header">
+  <div class="pg-eyebrow">
+    <span class="pg-dot"></span>
+    Manzanar War Relocation Center · 3D World Pipeline
+    <span class="pg-dot"></span>
+  </div>
+  <h1 class="pg-title">Synthetic World Model <em>Provenance</em></h1>
+</div>
+
+<!-- Pipeline track -->
+<div class="pipeline-track" id="pipelineTrack"></div>
+
+<!-- Carousel -->
+<div class="carousel-wrap">
+  <div class="pips" id="pips"></div>
+  <div class="card" id="card">
+
+    <!-- Image -->
+    <div class="card-image" id="cardImage"></div>
+
+    <!-- Body -->
+    <div class="card-body" id="cardBody"></div>
+
+    <!-- Divider -->
+    <div class="card-divider"></div>
+
+    <!-- C2PA bar -->
+    <div class="c2pa-bar" id="c2paBar">
+      <div class="c2pa-left">
+        <span class="c2pa-badge">C2PA</span>
+        <span class="c2pa-status" id="c2paStatus">Content credentials</span>
+      </div>
+      <span class="c2pa-chevron" id="c2paChevron">&#8964;</span>
+    </div>
+
+    <!-- Manifest -->
+    <div class="manifest" id="manifest"></div>
+
+    <!-- Footer / nav -->
+    <div class="card-footer">
+      <span class="step-counter" id="stepCounter"></span>
+      <div class="nav-btns">
+        <button class="nav-prev" id="navPrev">&#8592; Back</button>
+        <button class="nav-next" id="navNext">Next &#8594;</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ── Data ────────────────────────────────────────────────────── */
+var STEPS = [
+  {
+    id: 'seed',
+    type: 'source',
+    typeLabel: 'Archival Photograph',
+    title: 'Seed Image',
+    filename: 'ddr-manz-2-65_front.jpg',
+    cid: 'bafkreiafetlwkvjuxj24xkjiwob6ec53v7e7ija4xhlikk64kc7k2vfzqi',
+    imageSrc: '../ddr-manz-2-65.jpg',
+    desc: 'Densho Digital Repository photograph of a front-facing portrait from Block 2, used as the primary visual reference for Marble world generation.',
+    edge: null,
+    prompt: null,
+    ingredients: null,
+    c2pa: {
+      action: 'c2pa.placed',
+      actionClass: 'pill-placed',
+      desc: 'Archival photograph ingested as primary visual reference for Marble panorama generation.',
+      generator: 'Starling Lab / EE292J',
+      tsAuthority: 'timestamp.digicert.com',
+      rows: [
+        { k: 'file_name',   v: 'ddr-manz-2-65_front.jpg', mono: true },
+        { k: 'project_id',  v: 'densho-ee292j' },
+        { k: 'collection',  v: 'Densho Digital Repository · ddr-manz-2' },
+        { k: 'source_type', v: 'digitalCapture' }
+      ]
+    }
+  },
+  {
+    id: 'init_pano',
+    type: 'pano',
+    typeLabel: 'AI-Generated Panorama',
+    title: 'Initial Panorama',
+    filename: 'initial_pano.png',
+    cid: 'bafkreidbbopjk74uqdtooqyg6tgfmz3ylbefx32w2namo2qyl2r7ilkp3y',
+    imageSrc: null,
+    desc: 'Equirectangular panorama generated from the seed photograph by WorldLabs Marble.',
+    edge: { label: 'generated', from: 'Seed Image', cls: 'generated' },
+    prompt: null,
+    ingredients: [
+      { title: 'ddr-manz-2-65_front.jpg', rel: 'inputTo', relCls: 'inputTo',
+        cid: 'bafkreiafetlwkvjuxj24xkjiwob6ec53v7e7ija4xhlikk64kc7k2vfzqi' }
+    ],
+    c2pa: {
+      action: 'c2pa.created',
+      actionClass: 'pill-created',
+      desc: 'Initial equirectangular panorama generated from seed image by Marble.',
+      generator: 'WorldLabs Marble',
+      tsAuthority: 'timestamp.digicert.com',
+      rows: [
+        { k: 'model',       v: 'WorldLabs Marble' },
+        { k: 'source_type', v: 'trainedAlgorithmicMedia' },
+        { k: 'seed_cid',    v: 'bafkreiafetlwkvjuxj24xkjiwob6ec53v7e7ija4xhlikk64kc7k2vfzqi', mono: true }
+      ]
+    }
+  },
+  {
+    id: 'final_pano',
+    type: 'pano',
+    typeLabel: 'Edited Panorama',
+    title: 'Final Panorama',
+    filename: 'final_pano.png',
+    cid: 'bafkreieka2otbizmwduczyszyzmv3epdev4xfdn7whss6c3wyl5upo22ki',
+    imageSrc: null,
+    desc: 'Panorama edited via text prompt informed by the 1944 Manzanar camp layout map.',
+    edge: { label: 'edited', from: 'Initial Panorama', cls: 'edited' },
+    prompt: 'Remove the fences between the barracks and place barbed wire on the outer perimeter of the camp, far in the distance. Add a guard tower on the left back corner. Remove leaves from trees and cover branches with snow.',
+    ingredients: [
+      { title: 'initial_pano.png', rel: 'inputTo', relCls: 'inputTo',
+        cid: 'bafkreidbbopjk74uqdtooqyg6tgfmz3ylbefx32w2namo2qyl2r7ilkp3y' },
+      { title: '03_npmaps_historical_1944.gif', rel: 'informed by', relCls: 'informed',
+        cid: 'bafkreigf2swd5xlplrvvspdz65pk6nsqqii7rib45tonlfbre6midejj6a' }
+    ],
+    c2pa: {
+      action: 'c2pa.edited',
+      actionClass: 'pill-edited',
+      desc: 'Panorama edited using a text prompt informed by a reference document (1944 Manzanar camp layout map).',
+      generator: 'WorldLabs Marble',
+      tsAuthority: 'timestamp.digicert.com',
+      rows: [
+        { k: 'model',       v: 'WorldLabs Marble' },
+        { k: 'source_type', v: 'trainedAlgorithmicMedia' },
+        { k: 'ref_source',  v: '03_npmaps_historical_1944.gif · manzanar' },
+        { k: 'ref_cid',     v: 'bafkreigf2swd5xlplrvvspdz65pk6nsqqii7rib45tonlfbre6midejj6a', mono: true }
+      ]
+    }
+  },
+  {
+    id: 'init_world',
+    type: 'world',
+    typeLabel: '3-D World · Gaussian Splats',
+    title: 'Initial 3-D World',
+    filename: 'initial_splats.sog',
+    cid: 'bafkreiagiqwrcg57mnkh65lulgvtt4na2ice3l3nm5nebnqxkz25p5tphi',
+    imageSrc: null,
+    desc: 'Initial 3-D world model generated from the final edited panorama using Marble. Stored as a Gaussian splat scene (.sog).',
+    edge: { label: 'generated', from: 'Final Panorama', cls: 'generated' },
+    prompt: null,
+    ingredients: [
+      { title: 'final_pano.png', rel: 'inputTo', relCls: 'inputTo',
+        cid: 'bafkreieka2otbizmwduczyszyzmv3epdev4xfdn7whss6c3wyl5upo22ki' }
+    ],
+    c2pa: {
+      action: 'c2pa.created',
+      actionClass: 'pill-created',
+      desc: 'Initial 3-D world model generated from the final edited panorama by Marble.',
+      generator: 'WorldLabs Marble',
+      tsAuthority: 'timestamp.digicert.com',
+      rows: [
+        { k: 'model',       v: 'WorldLabs Marble' },
+        { k: 'format',      v: '.sog (Gaussian splat scene)' },
+        { k: 'source_type', v: 'trainedAlgorithmicMedia' },
+        { k: 'seed_cid',    v: 'bafkreieka2otbizmwduczyszyzmv3epdev4xfdn7whss6c3wyl5upo22ki', mono: true }
+      ]
+    }
+  },
+  {
+    id: 'final_world',
+    type: 'world',
+    typeLabel: '3-D World · Expanded',
+    title: 'Final 3-D World',
+    filename: 'final-outdoors.sog',
+    cid: 'bafkreiebpiza4uxyzwhxvwnd3ccgdoyapvcemzwmtgkgjqizyhjo2zlmb4',
+    imageSrc: null,
+    desc: 'World expanded via text prompt to allow free first-person exploration down a full row of barracks.',
+    edge: { label: 'edited', from: 'Initial 3-D World', cls: 'edited' },
+    prompt: 'Extend the scene to allow for free exploration down a row of barracks.',
+    ingredients: [
+      { title: 'initial_splats.sog', rel: 'inputTo', relCls: 'inputTo',
+        cid: 'bafkreiagiqwrcg57mnkh65lulgvtt4na2ice3l3nm5nebnqxkz25p5tphi' }
+    ],
+    c2pa: {
+      action: 'c2pa.edited',
+      actionClass: 'pill-edited',
+      desc: '3-D world expanded using a text prompt to allow free first-person exploration.',
+      generator: 'WorldLabs Marble',
+      tsAuthority: 'timestamp.digicert.com',
+      rows: [
+        { k: 'model',       v: 'WorldLabs Marble' },
+        { k: 'format',      v: '.sog (Gaussian splat scene)' },
+        { k: 'source_type', v: 'trainedAlgorithmicMedia' },
+        { k: 'parent_cid',  v: 'bafkreiagiqwrcg57mnkh65lulgvtt4na2ice3l3nm5nebnqxkz25p5tphi', mono: true }
+      ]
+    }
+  }
+];
+
+var EDGE_LABELS = ['', 'generated', 'edited', 'generated', 'edited'];
+var PLACEHOLDER_THEMES = {
+  source: 'theme-source',
+  pano:   'theme-pano',
+  world:  'theme-world',
+  ref:    'theme-ref'
+};
+
+/* ── State ───────────────────────────────────────────────────── */
+var current = 0;
+var manifestOpen = false;
+
+/* ── Refs ────────────────────────────────────────────────────── */
+function $$(id) { return document.getElementById(id); }
+
+/* ── Pipeline track ─────────────────────────────────────────── */
+function buildTrack() {
+  var track = $$('pipelineTrack');
+  track.innerHTML = '';
+  STEPS.forEach(function (s, i) {
+    if (i > 0) {
+      var edge = document.createElement('div');
+      edge.className = 'pt-edge';
+      edge.innerHTML =
+        '<div class="pt-edge-line"></div>' +
+        '<div class="pt-edge-label">' + EDGE_LABELS[i] + '</div>';
+      track.appendChild(edge);
+    }
+    var node = document.createElement('div');
+    node.className = 'pt-node';
+    node.innerHTML =
+      '<div class="pt-dot"><div class="pt-dot-inner"></div></div>' +
+      '<div class="pt-label">' + s.title + '</div>';
+    node.addEventListener('click', (function (idx) {
+      return function () { goTo(idx); };
+    })(i));
+    track.appendChild(node);
+  });
+}
+
+function updateTrack() {
+  var nodes = $$('pipelineTrack').querySelectorAll('.pt-node');
+  nodes.forEach(function (n, i) {
+    n.classList.remove('active', 'done');
+    if (i < current) n.classList.add('done');
+    else if (i === current) n.classList.add('active');
+  });
+}
+
+/* ── Pips ────────────────────────────────────────────────────── */
+function updatePips() {
+  $$('pips').innerHTML = STEPS.map(function (_, i) {
+    var cls = i < current ? 'done' : i === current ? 'active' : '';
+    return '<div class="pip ' + cls + '"></div>';
+  }).join('');
+}
+
+/* ── Card render ─────────────────────────────────────────────── */
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderCard() {
+  var s = STEPS[current];
+
+  // Image
+  var imgEl = $$('cardImage');
+  if (s.imageSrc) {
+    imgEl.innerHTML = '<img src="' + esc(s.imageSrc) + '" alt="' + esc(s.title) + '" onerror="this.parentNode.innerHTML=\'<div class=\\\"card-image-placeholder ' + PLACEHOLDER_THEMES[s.type] + '\\\"><div class=\\\"ph-title\\\">' + esc(s.title) + '</div><div class=\\\"ph-sub\\\">' + esc(s.typeLabel) + '</div></div>\'">';
+  } else {
+    imgEl.innerHTML = '<div class="card-image-placeholder ' + PLACEHOLDER_THEMES[s.type] + '">' +
+      '<div class="ph-title">' + esc(s.title) + '</div>' +
+      '<div class="ph-sub">' + esc(s.typeLabel) + '</div>' +
+      '</div>';
+  }
+
+  // Edge badge
+  if (s.edge) {
+    imgEl.innerHTML += '<div class="edge-badge">' +
+      '<span class="edge-arrow">&#8592;</span>' +
+      '<span class="edge-from">' + esc(s.edge.from) + '</span>' +
+      '<span class="edge-rel ' + s.edge.cls + '">' + esc(s.edge.label) + '</span>' +
+      '</div>';
+  }
+
+  // Body
+  var body = '  <div class="card-type">' + esc(s.typeLabel) + '</div>' +
+    '<h2 class="card-title">' + esc(s.title) + '</h2>' +
+    '<div class="card-filename">' + esc(s.filename) + '</div>' +
+    '<div class="card-cid">' + esc(s.cid) + '</div>' +
+    '<p class="card-desc">' + esc(s.desc) + '</p>';
+
+  if (s.prompt) {
+    body += '<div class="card-prompt">' +
+      '<div class="card-prompt-label">Text prompt</div>' +
+      '<div class="card-prompt-text">' + esc(s.prompt) + '</div>' +
+      '</div>';
+  }
+
+  if (s.ingredients && s.ingredients.length) {
+    body += '<div class="card-ingredients">' +
+      '<div class="card-ingredients-label">Ingredients</div>';
+    s.ingredients.forEach(function (ing) {
+      body += '<div class="ingredient-row">' +
+        '<span class="ing-rel ' + ing.relCls + '">' + esc(ing.rel) + '</span>' +
+        '<div class="ing-info">' +
+        '<div class="ing-name">' + esc(ing.title) + '</div>' +
+        '<div class="ing-cid">' + esc(ing.cid) + '</div>' +
+        '</div></div>';
+    });
+    body += '</div>';
+  }
+
+  $$('cardBody').innerHTML = body;
+
+  // Manifest
+  var c = s.c2pa;
+  var rows = (c.rows || []).map(function (r) {
+    return '<div class="manifest-row"><span class="mk">' + esc(r.k) + '</span>' +
+      '<span class="mv' + (r.mono ? ' mv-mono' : '') + '">' + esc(r.v) + '</span></div>';
+  }).join('');
+
+  $$('manifest').innerHTML =
+    '<div class="manifest-inner">' +
+    '<div class="manifest-section">' +
+    '<p class="manifest-heading">c2pa.actions</p>' +
+    '<div class="manifest-row"><span class="mk">action</span><span class="mv"><span class="action-pill ' + c.actionClass + '">' + esc(c.action) + '</span></span></div>' +
+    '<div class="manifest-row"><span class="mk">description</span><span class="mv">' + esc(c.desc) + '</span></div>' +
+    '<div class="manifest-row"><span class="mk">softwareAgent</span><span class="mv">' + esc(c.generator) + '</span></div>' +
+    '<div class="manifest-row"><span class="mk">timestamp authority</span><span class="mv">' + esc(c.tsAuthority) + '</span></div>' +
+    '</div>' +
+    '<div class="manifest-section">' +
+    '<p class="manifest-heading">stds.schema-org.CreativeWork</p>' +
+    rows +
+    '</div>' +
+    '</div>';
+
+  // Reset manifest open state
+  manifestOpen = false;
+  $$('manifest').classList.remove('open');
+  $$('c2paChevron').style.transform = '';
+
+  // Counter
+  $$('stepCounter').textContent = (current + 1) + ' / ' + STEPS.length;
+
+  // Nav buttons
+  $$('navPrev').disabled = current === 0;
+  $$('navNext').disabled = current === STEPS.length - 1;
+  $$('navNext').textContent = current === STEPS.length - 1 ? 'Done' : 'Next →';
+}
+
+/* ── Navigation ──────────────────────────────────────────────── */
+function goTo(idx) {
+  if (idx < 0 || idx >= STEPS.length) return;
+  current = idx;
+  renderCard();
+  updatePips();
+  updateTrack();
+}
+
+$$('navPrev').addEventListener('click', function () { goTo(current - 1); });
+$$('navNext').addEventListener('click', function () { if (current < STEPS.length - 1) goTo(current + 1); });
+
+/* ── C2PA toggle ─────────────────────────────────────────────── */
+$$('c2paBar').addEventListener('click', function () {
+  manifestOpen = !manifestOpen;
+  $$('manifest').classList.toggle('open', manifestOpen);
+  $$('c2paChevron').style.transform = manifestOpen ? 'rotate(180deg)' : '';
+});
+
+/* ── Keyboard ────────────────────────────────────────────────── */
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowLeft')  goTo(current - 1);
+  if (e.key === 'ArrowRight') goTo(current + 1);
+});
+
+/* ── Init ────────────────────────────────────────────────────── */
+buildTrack();
+goTo(0);
+</script>
+</body>
+</html>

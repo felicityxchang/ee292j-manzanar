@@ -44,10 +44,12 @@ HotspotManager.attributes.add('hotspots', {
         { name: 'label',            type: 'string', default: 'Hotspot' },
         // Modal content
         { name: 'artifactType',     type: 'string', default: 'Photograph' },
-        { name: 'artifactImageUrl', type: 'string', default: '' },
+        { name: 'artifactImage',    type: 'asset',  assetType: 'texture' },
         { name: 'artifactSource',   type: 'string', default: 'Courtesy Manzanar National Historic Site' },
-        // C2PA closed loop — set this to the asset's IPFS CID
+        // C2PA closed loop — stamped file CID
         { name: 'c2paCid',         type: 'string', default: '' },
+        // Parent CID that holds AA attributes (from `starling attr get --all <c2paCid>` → parents.derived)
+        { name: 'c2paAttrCid',     type: 'string', default: '' },
         // Static fallbacks (used when no CID is set or fetch fails)
         { name: 'fallbackTitle',       type: 'string', default: '' },
         { name: 'fallbackAuthor',      type: 'string', default: '' },
@@ -207,40 +209,34 @@ HotspotManager.prototype._buildModal = function () {
         '  <div id="manz-manifest">' +
         '    <div class="manz-manifest-inner">' +
 
-        // Asset identity
+        // c2pa.actions assertion
         '      <div class="manz-manifest-section">' +
-        '        <p class="manz-manifest-heading">Asset identity</p>' +
-        '        <div class="manz-manifest-row"><span class="manz-mk">Title</span><span class="manz-mv" id="c2pa-title"></span></div>' +
-        '        <div class="manz-manifest-row"><span class="manz-mk">Format</span><span class="manz-mv">image/jpeg</span></div>' +
-        '        <div class="manz-manifest-row"><span class="manz-mk">File name</span><span class="manz-mv manz-mono" id="c2pa-filename"></span></div>' +
-        '        <div class="manz-manifest-row"><span class="manz-mk">SHA-256</span><span class="manz-mv manz-mono" id="c2pa-sha256"></span></div>' +
-        '      </div>' +
-
-        // Provenance
-        '      <div class="manz-manifest-section">' +
-        '        <p class="manz-manifest-heading">Provenance</p>' +
-        '        <div class="manz-manifest-row"><span class="manz-mk">Author</span><span class="manz-mv" id="c2pa-author"></span></div>' +
-        '        <div class="manz-manifest-row"><span class="manz-mk">Date created</span><span class="manz-mv" id="c2pa-date"></span></div>' +
-        '        <div class="manz-manifest-row"><span class="manz-mk">License</span><span class="manz-mv" id="c2pa-rights"></span></div>' +
-        '        <div class="manz-manifest-row"><span class="manz-mk">Collection</span><span class="manz-mv">Manzanar War Relocation Center</span></div>' +
-        '      </div>' +
-
-        // Actions
-        '      <div class="manz-manifest-section">' +
-        '        <p class="manz-manifest-heading">Actions</p>' +
-        '        <div style="padding:4px 0;">' +
-        '          <span class="manz-pill manz-pill-source">c2pa.published</span>' +
-        '        </div>' +
-        '        <p id="c2pa-action-desc" class="manz-action-desc"></p>' +
-        '      </div>' +
-
-        // Claim generator & credential
-        '      <div class="manz-manifest-section">' +
-        '        <p class="manz-manifest-heading">Signing</p>' +
+        '        <p class="manz-manifest-heading">c2pa.actions</p>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">Action</span><span class="manz-mv"><span class="manz-pill manz-pill-source">c2pa.published</span></span></div>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">Description</span><span class="manz-mv" id="c2pa-action-desc">Archival photograph published with provenance metadata. Original held at Library of Congress or NARA.</span></div>' +
         '        <div class="manz-manifest-row"><span class="manz-mk">Claim generator</span><span class="manz-mv">Starling Lab / EE292J</span></div>' +
         '        <div class="manz-manifest-row"><span class="manz-mk">Timestamp authority</span><span class="manz-mv">timestamp.digicert.com</span></div>' +
-        '        <div class="manz-manifest-row"><span class="manz-mk">Credential issued</span><span class="manz-mv" id="c2pa-vc-date"></span></div>' +
-        '        <div class="manz-manifest-row"><span class="manz-mk">Issuer</span><span class="manz-mv manz-mono" id="c2pa-vc-issuer"></span></div>' +
+        '      </div>' +
+
+        // stds.schema-org.CreativeWork assertion
+        '      <div class="manz-manifest-section">' +
+        '        <p class="manz-manifest-heading">stds.schema-org.CreativeWork</p>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">@type</span><span class="manz-mv">Photograph</span></div>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">name</span><span class="manz-mv" id="c2pa-title"></span></div>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">description</span><span class="manz-mv" id="c2pa-description"></span></div>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">author</span><span class="manz-mv" id="c2pa-author"></span></div>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">dateCreated</span><span class="manz-mv" id="c2pa-date"></span></div>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">license</span><span class="manz-mv" id="c2pa-rights"></span></div>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">identifier</span><span class="manz-mv manz-mono" id="c2pa-filename"></span></div>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">isPartOf</span><span class="manz-mv">Manzanar War Relocation Center</span></div>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">locationCreated</span><span class="manz-mv">Independence, California</span></div>' +
+        '      </div>' +
+
+        // time_created credential
+        '      <div class="manz-manifest-section">' +
+        '        <p class="manz-manifest-heading">Credential · time_created</p>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">issuanceDate</span><span class="manz-mv" id="c2pa-vc-date"></span></div>' +
+        '        <div class="manz-manifest-row"><span class="manz-mk">issuer</span><span class="manz-mv manz-mono" id="c2pa-vc-issuer"></span></div>' +
         '      </div>' +
 
         '    </div>' +
@@ -276,8 +272,8 @@ HotspotManager.prototype._openModal = function (hs) {
     this._modalOpen = true;
 
     var img = document.getElementById('manz-modal-img');
-    img.src = hs.artifactImageUrl || '';
-    img.alt = hs.fallbackTitle    || '';
+    img.src = hs.artifactImage ? hs.artifactImage.getFileUrl() : '';
+    img.alt = hs.fallbackTitle || '';
 
     document.getElementById('manz-modal-tag').textContent =
         (hs.artifactType || 'Photograph') +
@@ -309,13 +305,11 @@ HotspotManager.prototype._openModal = function (hs) {
 
 HotspotManager.prototype._setManifestFields = function (d) {
     document.getElementById('c2pa-title').textContent       = d.title       || '—';
-    document.getElementById('c2pa-filename').textContent    = d.fileName    || '—';
-    document.getElementById('c2pa-sha256').textContent      = d.sha256      || '—';
+    document.getElementById('c2pa-description').textContent = d.description || '—';
     document.getElementById('c2pa-author').textContent      = d.author      || '—';
     document.getElementById('c2pa-date').textContent        = d.date        || '—';
     document.getElementById('c2pa-rights').textContent      = d.rights      || '—';
-    document.getElementById('c2pa-action-desc').textContent =
-        'Archival photograph published with provenance metadata. Original held at Library of Congress or NARA.';
+    document.getElementById('c2pa-filename').textContent    = d.fileName    || '—';
     document.getElementById('c2pa-vc-date').textContent     = d.vcDate      || '—';
     document.getElementById('c2pa-vc-issuer').textContent   = d.vcIssuer    || '—';
 };
@@ -323,15 +317,19 @@ HotspotManager.prototype._setManifestFields = function (d) {
 // ── C2PA fetch loop ──────────────────────────────────────────
 
 HotspotManager.prototype._fetchC2PA = function (hs, cid) {
-    var self     = this;
-    var base     = this.aaEndpoint.replace(/\/$/, '');
-    var status   = document.getElementById('manz-c2pa-status');
+    var status = document.getElementById('manz-c2pa-status');
     status.textContent = 'Fetching credentials…';
+    this._fetchAttrs(hs, cid);
+};
 
-    var attrs = ['title', 'author', 'date_taken', 'description', 'rights', 'file_name', 'sha256', 'time_created'];
+HotspotManager.prototype._fetchAttrs = function (hs, attrCid) {
+    var self   = this;
+    var base   = this.aaEndpoint.replace(/\/$/, '');
+    var status = document.getElementById('manz-c2pa-status');
+    var attrs  = ['title', 'author', 'date_taken', 'description', 'rights', 'file_name', 'time_created'];
 
     var fetches = attrs.map(function (attr) {
-        return fetch(base + '/v1/c/' + encodeURIComponent(cid) + '/' + attr + '?format=vc')
+        return fetch(base + '/v1/c/' + encodeURIComponent(attrCid) + '/' + attr + '?format=vc', { cache: 'no-store' })
             .then(function (r) { return r.ok ? r.json() : null; })
             .catch(function () { return null; });
     });
@@ -342,34 +340,33 @@ HotspotManager.prototype._fetchC2PA = function (hs, cid) {
         var byAttr = {};
         attrs.forEach(function (attr, i) {
             var vc = results[i];
-            if (vc && vc.credentialSubject) {
-                byAttr[attr] = vc.credentialSubject[attr];
+            if (vc && vc.credentialSubject && vc.credentialSubject.value !== undefined) {
+                byAttr[attr] = vc.credentialSubject.value;
             }
         });
 
         // Pull proof info from the time_created VC
         var vcDate   = '';
         var vcIssuer = '';
-        var tcVc     = results[attrs.indexOf('time_created')];
+        var tcVc = results[attrs.indexOf('time_created')];
         if (tcVc) {
-            vcDate   = (tcVc.proof && tcVc.proof.created)             || tcVc.issuanceDate || '';
-            vcIssuer = (typeof tcVc.issuer === 'string' ? tcVc.issuer : (tcVc.issuer && tcVc.issuer.id)) || '';
+            vcDate   = tcVc.issuanceDate || '';
+            vcIssuer = tcVc.issuer       || '';
         }
 
         var title = byAttr['title'] || hs.fallbackTitle || '';
 
         self._setManifestFields({
-            title:    title,
-            author:   byAttr['author']      || hs.fallbackAuthor      || '',
-            date:     byAttr['date_taken']  || hs.fallbackDate        || '',
-            rights:   byAttr['rights']      || '',
-            fileName: byAttr['file_name']   || hs.fallbackFileName    || '',
-            sha256:   byAttr['sha256']      || '',
-            vcDate:   vcDate,
-            vcIssuer: vcIssuer
+            title:       title,
+            description: byAttr['description'] || hs.fallbackDescription || '',
+            author:      byAttr['author']       || hs.fallbackAuthor      || '',
+            date:        byAttr['date_taken']   || hs.fallbackDate        || '',
+            rights:      byAttr['rights']       || '',
+            fileName:    byAttr['file_name']    || hs.fallbackFileName    || '',
+            vcDate:      vcDate,
+            vcIssuer:    vcIssuer
         });
 
-        // Update modal header with live title
         document.getElementById('manz-modal-title').textContent = title;
         document.getElementById('manz-modal-caption').textContent =
             byAttr['description'] || hs.fallbackDescription || '';

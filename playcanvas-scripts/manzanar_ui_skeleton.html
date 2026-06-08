@@ -620,19 +620,71 @@ body {
       <div class="art-meta">
         <div class="art-meta-row">
           <div>
-            <div class="art-type">Watercolor Painting</div>
-            <div class="art-caption">Snow in January 1944, Block 35 at Manzanar</div>
+            <div class="art-type">Photograph</div>
+            <div class="art-caption" id="art-caption">Street scene with clouds, Manzanar</div>
           </div>
           <div class="art-badges">
             <div class="badge-auth"><span class="g">&#169;P</span> Authenticated</div>
-            <div class="badge-audio">&#9834; Audio quieted</div>
           </div>
         </div>
-        <div class="art-src">
-          Manzanar, California, January 6, 1944.
-          Courtesy of <a href="#">Manzanar National Historic Site and the Kango Takamura Collection</a>.
+        <div class="art-src" id="art-src">
+          Courtesy of <a href="#">Manzanar National Historic Site</a>.
         </div>
       </div>
+
+      <!-- C2PA credentials bar -->
+      <div class="art-c2pa-bar" id="art-c2pa-bar">
+        <div class="art-c2pa-left">
+          <span class="art-c2pa-badge">C2PA</span>
+          <span class="art-c2pa-label" id="art-c2pa-status">Content credentials verified</span>
+        </div>
+        <span class="art-c2pa-chevron" id="art-c2pa-chevron">&#8964;</span>
+      </div>
+
+      <!-- C2PA manifest panel -->
+      <div class="art-manifest" id="art-manifest">
+        <div class="art-manifest-inner">
+
+          <!-- Asset identity -->
+          <div class="art-manifest-section">
+            <p class="art-manifest-heading">Asset identity</p>
+            <div class="art-manifest-row"><span class="art-mk">Title</span><span class="art-mv" id="am-title">Street scene with clouds, Manzanar</span></div>
+            <div class="art-manifest-row"><span class="art-mk">Format</span><span class="art-mv">image/jpeg</span></div>
+            <div class="art-manifest-row"><span class="art-mk">File name</span><span class="art-mv art-mono" id="am-filename">17_adams_street_scene_clouds.jpg</span></div>
+            <div class="art-manifest-row"><span class="art-mk">SHA-256</span><span class="art-mv art-mono" id="am-sha256">—</span></div>
+          </div>
+
+          <!-- Provenance -->
+          <div class="art-manifest-section">
+            <p class="art-manifest-heading">Provenance</p>
+            <div class="art-manifest-row"><span class="art-mk">Author</span><span class="art-mv" id="am-author">Ansel Adams</span></div>
+            <div class="art-manifest-row"><span class="art-mk">Date created</span><span class="art-mv" id="am-date">1943</span></div>
+            <div class="art-manifest-row"><span class="art-mk">License</span><span class="art-mv" id="am-rights">—</span></div>
+            <div class="art-manifest-row"><span class="art-mk">Collection</span><span class="art-mv">Manzanar War Relocation Center</span></div>
+            <div class="art-manifest-row"><span class="art-mk">Repository</span><span class="art-mv"><a class="art-link" href="https://www.loc.gov/collections/ansel-adams-manzanar/" target="_blank">Library of Congress</a></span></div>
+          </div>
+
+          <!-- Actions -->
+          <div class="art-manifest-section">
+            <p class="art-manifest-heading">Actions</p>
+            <div style="padding:4px 0;">
+              <span class="art-pill art-pill-source">c2pa.published</span>
+            </div>
+            <p class="art-action-desc">Archival photograph published with provenance metadata. Original held at Library of Congress or NARA.</p>
+          </div>
+
+          <!-- Signing -->
+          <div class="art-manifest-section">
+            <p class="art-manifest-heading">Signing</p>
+            <div class="art-manifest-row"><span class="art-mk">Claim generator</span><span class="art-mv">Starling Lab / EE292J</span></div>
+            <div class="art-manifest-row"><span class="art-mk">Timestamp authority</span><span class="art-mv">timestamp.digicert.com</span></div>
+            <div class="art-manifest-row"><span class="art-mk">Credential issued</span><span class="art-mv" id="am-vc-date">—</span></div>
+            <div class="art-manifest-row"><span class="art-mk">Issuer</span><span class="art-mv art-mono" id="am-vc-issuer">—</span></div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </div>
 
